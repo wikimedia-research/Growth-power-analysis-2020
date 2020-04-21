@@ -92,9 +92,13 @@ run_power_simulations = function(reg_counts, coeffs) {
 }
 
 ## 1: Load in the parameters
+load('simulation_parameters/first4_params.txt', verbose = TRUE)
+## 2: Run simulations
+first4_results = run_power_simulations(reg_counts_first4, act_coeff_first4)
 
-## 2: Run simulation
-## 3: save output
+## 3: save output as a TSV
+write.table(first4_results, file = 'datasets/first4-results.tsv', sep = '\t', quote = FALSE,
+            row.names = FALSE)
 
 ## Do this for all four configurations (would've been easier if the variable names
 ## were the same in all four now, wouldn't it?)
