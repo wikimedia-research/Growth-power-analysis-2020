@@ -1,5 +1,17 @@
 ## Run all simulations to calculate power for newcomer activation
 
+# Wrapper for random numbers from bivariate normal:
+rbvnorm <- function(n, mus, sigmas, corr) {
+  mvtnorm::rmvnorm(
+    n = n,
+    mean = mus,
+    sigma = matrix(
+      c(sigmas[1]^2, rep(corr * sigmas[1] * sigmas[2], 2), sigmas[2]^2),
+      nrow = 2, byrow = TRUE
+    )
+  )
+}
+
 simulate_dataset <- function(N, sim_coeffs) {
   ## Simulate a dataset for the given number of wikis and participant counts (N)
   ## using the given set of coefficients (sim_coeffs)
@@ -22,31 +34,41 @@ simulate_dataset <- function(N, sim_coeffs) {
   
   ## Treatment effect:
   beta_d <- rnorm(1, sim_coeffs[['beta']], sim_coeffs[['sigma_beta']])
+
+  ## Probability of registering on mobile:
+  p_mob = sim_coeffs[['p_mob']]
   
-  fake_data <- imap_dfr(N, ~ data.frame(
+  fake_data <- purrr::imap_dfr(N, ~ data.frame(
     wiki = .y,
     treatment = rbinom(.x, 1, 0.5), # 50/50 sampling into treatment vs control
     is_mobile = rbinom(.x, 1, p_mob[.y]) # per-wiki mobile registration probability
   )) %>% dplyr::mutate(
-    p = invlogit(alphas[wiki] + beta_d * treatment + beta_mobs[wiki] * is_mobile),
-    y = map_int(p, ~ rbinom(1, 1, prob = .x))
+    p = arm::invlogit(alphas[wiki] + beta_d * treatment + beta_mobs[wiki] * is_mobile),
+    y = purrr::map_int(p, ~ rbinom(1, 1, prob = .x))
   )
   return(fake_data)
 }
 
-estimate_power <- function(N, sim_coeffs, n_sims = 1000) {
-  print(paste("running", n_sims, "simulations for", length(N), "wikis, with",
-              paste(N, collapse=', '), "users"))
-  significant <- future_map_lgl(1:n_sims, function(i) {
-    fit <- lme4::glmer(
+simulated_model = function(sim_n, N, sim_coeffs) {
+  fit <- lme4::glmer(
       y ~ treatment + (1 + is_mobile | wiki),
       data = simulate_dataset(N, sim_coeffs),
       family = binomial()
-    )
-    beta_est <- fixef(fit)["treatment"]
-    beta_se <- se.fixef(fit)["treatment"]
-    return(beta_est - 2 * beta_se > 0) # H0: beta <= 0
-  })
+  )
+  beta_est <- lme4::fixef(fit)["treatment"]
+  beta_se <- arm::se.fixef(fit)["treatment"]
+  return(beta_est - 2 * beta_se > 0) # H0: beta <= 0
+}
+
+estimate_power <- function(N, sim_coeffs, n_sims = 1000) {
+  print(paste("running", n_sims, "simulations for", length(N), "wikis, with",
+              paste(N, collapse=', '), "users")
+  )
+  significant <- future_map_lgl(
+    1:n_sims,
+    simulated_model,
+    N, sim_coeffs
+  )
   return(mean(significant)) # Pr(reject H0 | H0 is false)
 }
 
@@ -94,11 +116,11 @@ run_power_simulations = function(reg_counts, coeffs) {
 ## 1: Load in the parameters
 load('simulation_parameters/first4_params.txt', verbose = TRUE)
 ## 2: Run simulations
-first4_results = run_power_simulations(reg_counts_first4, act_coeff_first4)
+# first4_results = run_power_simulations(reg_counts_first4, act_coeff_first4)
 
 ## 3: save output as a TSV
-write.table(first4_results, file = 'datasets/first4-results.tsv', sep = '\t', quote = FALSE,
-            row.names = FALSE)
+# write.table(first4_results, file = 'datasets/first4-results.tsv', sep = '\t', quote = FALSE,
+#            row.names = FALSE)
 
 ## Do this for all four configurations (would've been easier if the variable names
 ## were the same in all four now, wouldn't it?)

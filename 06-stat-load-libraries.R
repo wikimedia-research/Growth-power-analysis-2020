@@ -1,12 +1,11 @@
 ## Loading all necessary libraries to run this on a stat-machine
 
-library(arm)
-library(data.table)
-library(magrittr)
-library(purrr)
-library(tidyr)
-library(ggplot2)
-library(pals)
+# for %>%
+library(dplyr)
+
+## Set BLAS threads to 1 because we parallelize using furrr
+library(RhpcBLASctl)
+blas_set_num_threads(1)
 
 ## parallelization
 library(furrr) # future + purrr
