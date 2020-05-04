@@ -77,7 +77,7 @@ par(mfrow = c(1, 2))
 plot(NA, NA, xlim = c(0, 1), ylim = c(0.15, 0.5), xlab = "platform", ylab = "prop_act",
      main = "Per-wiki differences of activation\nproportions by display")
 wiki_colors <- brewer.pal(n = length(wikis), name = "Set1")
-names(wiki_colors) = wikis  
+names(wiki_colors) = wikis
 for (wiki in wikis) {
   x0 <- 0
   y0 <- prop_acts$prop_act[prop_acts$wiki_db == wiki & prop_acts$platform == 'desktop']
@@ -126,8 +126,6 @@ arm::invlogit(mu + (beta_mob + 3 * c(-sigma_mob, sigma_mob)))
 p_mob <- user_data[wiki_db %in% wikis,
                    list(prop_mobile = n_registered[platform == 'mobile'] / sum(n_registered)),
                    by = "wiki_db"]$prop_mobile
-
-
 
 ## Turn all our coefficients into a list:
 act_coeff_first4 <- list(

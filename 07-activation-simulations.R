@@ -116,12 +116,25 @@ run_power_simulations = function(reg_counts, coeffs) {
 ## 1: Load in the parameters
 load('simulation_parameters/first4_params.txt', verbose = TRUE)
 ## 2: Run simulations
-# first4_results = run_power_simulations(reg_counts_first4, act_coeff_first4)
+first4_results = run_power_simulations(reg_counts_first4, act_coeff_first4)
 
 ## 3: save output as a TSV
-# write.table(first4_results, file = 'datasets/first4-results.tsv', sep = '\t', quote = FALSE,
-#            row.names = FALSE)
+write.table(first4_results, file = 'datasets/first4-results.tsv', sep = '\t', quote = FALSE,
+            row.names = FALSE)
 
 ## Do this for all four configurations (would've been easier if the variable names
 ## were the same in all four now, wouldn't it?)
+load('simulation_parameters/current_params.txt', verbose = TRUE)
+current_results = run_power_simulations(reg_counts_current, act_coeff_current)
+write.table(current_results, file = 'datasets/current-results.tsv', sep = '\t', quote = FALSE,
+            row.names = FALSE)
 
+load('simulation_parameters/addfr_params.txt', verbose = TRUE)
+addfr_results = run_power_simulations(reg_counts_addfr, act_coeff_addfr)
+write.table(addfr_results, file = 'datasets/addfr-results.tsv', sep = '\t', quote = FALSE,
+            row.names = FALSE)
+
+load('simulation_parameters/addall_params.txt', verbose = TRUE)
+addall_results = run_power_simulations(reg_counts_addall, act_coeff_addall)
+write.table(addall_results, file = 'datasets/addall-results.tsv', sep = '\t', quote = FALSE,
+            row.names = FALSE)
