@@ -108,7 +108,7 @@ run_power_simulations = function(reg_counts, coeffs) {
   )
   
   ## Flatten the list into a data.frame
-  x = rbindlist(lapply(activation_powers, as.data.frame.list))
+  x = data.table::rbindlist(lapply(activation_powers, as.data.frame.list))
   x[, `Effect size` := ordered(c("10%", "5%", "2%"), c("10%", "5%", "2%"))]
   return(x)
 }

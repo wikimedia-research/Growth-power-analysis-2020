@@ -9,5 +9,5 @@ blas_set_num_threads(1)
 
 ## parallelization
 library(furrr) # future + purrr
-options(mc.cores = 8)
+options(mc.cores = 10)
 plan(multiprocess)
