@@ -54,3 +54,26 @@ load('simulation_parameters/first4_retention_params.txt', verbose = TRUE)
 ##write.table(first4_retention_results, file = 'datasets/first4-retention-results.tsv',
 ##            sep = '\t', quote = FALSE, row.names = FALSE)
 
+## Current set of wikis
+load('simulation_parameters/current_retention_params.txt', verbose = TRUE)
+
+## current_retention_results = run_retention_simulations(act_counts_current, ret_coeff_current)
+
+write.table(current_retention_results, file = 'datasets/current-retention-results.tsv',
+            sep = '\t', quote = FALSE, row.names = FALSE)
+
+## Add French
+load('simulation_parameters/addfr_retention_params.txt', verbose = TRUE)
+
+## addfr_retention_results = run_retention_simulations(act_counts_addfr, ret_coeff_addfr)
+
+write.table(addfr_retention_results, file = 'datasets/addfr-retention-results.tsv',
+            sep = '\t', quote = FALSE, row.names = FALSE)
+
+## Add all
+load('simulation_parameters/addall_retention_params.txt', verbose = TRUE)
+
+## addall_retention_results = run_retention_simulations(act_counts_addall, ret_coeff_addall)
+
+write.table(addall_retention_results, file = 'datasets/addall-retention-results.tsv',
+            sep = '\t', quote = FALSE, row.names = FALSE)
